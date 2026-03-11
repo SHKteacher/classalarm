@@ -57,14 +57,21 @@ def df_hash(df: Optional[pd.DataFrame]) -> str:
 
 
 def get_b2_value(df: pd.DataFrame) -> str:
-    """구글 시트 CSV에서 B2 셀 값 반환 (2행 2열 = iloc[0, 1]). 소리 재생 여부 판단용."""
+    """B2 셀 값 (소리 재생 판단용). 시트: A=내용, B=소리, C=점멸."""
     if df is None or df.empty or len(df.columns) < 2:
         return ""
     return str(df.iloc[0, 1]).strip()
 
 
-def render_board(df: Optional[pd.DataFrame]):
-    """전광판: A열(공지 내용)만 크게 표시. B열은 화면에 노출하지 않음."""
+def get_c2_value(df: pd.DataFrame) -> str:
+    """C2 셀 값 (점멸 여부 판단용)."""
+    if df is None or df.empty or len(df.columns) < 3:
+        return ""
+    return str(df.iloc[0, 2]).strip()
+
+
+def render_board(df: Optional[pd.DataFrame], flash: bool = False):
+    """전광판: A열(내용)만 표시. B·C열은 화면에 절대 표시하지 않음. flash=True면 30초간 점멸."""
     if df is None or df.empty:
         st.markdown(
             '<div class="board-text">표시할 데이터가 없습니다.</div>',
@@ -72,7 +79,7 @@ def render_board(df: Optional[pd.DataFrame]):
         )
         return
 
-    # A열(첫 번째 열)만 사용해 공지 내용 표시. B열은 사용하지 않음.
+    # A열(내용)만 사용. B(소리), C(점멸) 열은 사용하지 않음.
     col_a = df.iloc[:, 0]
     lines = col_a.astype(str).tolist()
 
@@ -83,10 +90,10 @@ def render_board(df: Optional[pd.DataFrame]):
         )
         return
 
-    # 여러 줄을 전광판 스타일로 표시
+    cls = "board-text flash" if flash else "board-text"
     html_lines = "<br>".join(lines)
     st.markdown(
-        f'<div class="board-text">{html_lines}</div>', unsafe_allow_html=True
+        f'<div class="{cls}">{html_lines}</div>', unsafe_allow_html=True
     )
 
 
@@ -124,7 +131,7 @@ def main():
             background: transparent;
         }
 
-        /* 전광판 텍스트: 15vw, 수직 중앙보다 약간 위, 정중앙, 줄 간격 가독성 */
+        /* 전광판 텍스트: 10vw, 수직 중앙보다 약간 위, 정중앙 */
         .board-text {
             width: 100%;
             min-height: 100vh;
@@ -140,9 +147,20 @@ def main():
             font-weight: 700;
             line-height: 1.55;
             letter-spacing: 0.02em;
+            background-color: #000000;
             color: #ffff66;
             font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
                          "Segoe UI", sans-serif;
+        }
+
+        /* C열=1일 때: 30초간 1초 간격 배경/글자 반전 (노랑↔검정), 30초 후 원래 상태 */
+        @keyframes board-flash {
+            0%   { background-color: #000000; color: #ffff66; }
+            50%  { background-color: #ffff66; color: #000000; }
+            100% { background-color: #000000; color: #ffff66; }
+        }
+        .board-text.flash {
+            animation: board-flash 2s linear 15 forwards;
         }
 
         /* 헤더/푸터 요소 등 불필요한 요소 최소화 */
@@ -210,15 +228,17 @@ def main():
     current_hash = df_hash(df)
     changed = current_hash != st.session_state.last_hash
     current_b2 = get_b2_value(df)
+    current_c2 = get_c2_value(df)
+    flash_on = current_c2 == "1"
 
-    # 화면: A열(공지)만 표시, B열은 표시하지 않음
+    # 화면: A열(내용)만 표시. B(소리)·C(점멸) 열은 절대 표시하지 않음. C=1이면 30초간 점멸
     if changed:
         st.session_state.last_hash = current_hash
         st.session_state.last_update_ts = time.time()
     with placeholder:
-        render_board(df)
+        render_board(df, flash=flash_on)
 
-    # B2가 '1'일 때만 소리 1회 재생. 재생 후에는 웹에서만 0으로 간주해 중복 재생 방지
+    # B열 값이 0에서 1로 바뀔 때만 소리 1회 재생
     if current_b2 == "1" and st.session_state.last_b2 != "1":
         play_sound("ding.wav")
         st.session_state.last_b2 = "1"
