@@ -307,7 +307,8 @@ def main():
     changed = current_hash != st.session_state.last_hash
     current_b2 = get_b2_value(df)
     current_c2 = get_c2_value(df)
-    c2_is_one = current_c2 in ("1", "1.0")  # 시트에서 1 또는 1.0으로 올 수 있음
+    b2_is_one = current_b2 in ("1", "1.0")  # B2 소리: 시트에서 1 또는 1.0으로 올 수 있음
+    c2_is_one = current_c2 in ("1", "1.0")  # C2 점멸: 시트에서 1 또는 1.0으로 올 수 있음
 
     # C열이 1일 때 점멸 시작: 1로 바뀌는 순간 또는 flash_start_time이 None이면 즉시 시작
     if c2_is_one:
@@ -335,7 +336,8 @@ def main():
         render_board(df, flash=flash_on, flash_elapsed=flash_elapsed)
 
     # B열 값이 0→1로 바뀔 때만 sound_trigger 설정 (컴포넌트에서 1회 재생, 세션으로 중복 방지)
-    if current_b2 == "1" and st.session_state.last_b2 != "1":
+    last_b2_is_one = st.session_state.last_b2 in ("1", "1.0")
+    if b2_is_one and not last_b2_is_one:
         st.session_state.sound_trigger = str(time.time())
         st.session_state.last_b2 = "1"
     else:
