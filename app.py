@@ -176,7 +176,7 @@ def main():
         "d/1dffblmQyM895-ONRKOnwArHwO4T17RHHtKyEoMh4ccI/export?format=csv"
     )
 
-    refresh_interval = 30  # 초
+    refresh_interval = 15  # 초
 
     # 세션 상태 초기화
     if "last_hash" not in st.session_state:
