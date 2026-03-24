@@ -255,8 +255,8 @@ def main():
 
     # 고정된 구글 시트 CSV URL (앱 시작 시 자동 사용)
     sheet_url = (
-        "https://docs.google.com/spreadsheets/"
-        "d/1dffblmQyM895-ONRKOnwArHwO4T17RHHtKyEoMh4ccI/export?format=csv"
+        "https://docs.google.com/spreadsheets"
+        "/d/1moZyvDHSsGtwUl19VKeYamJ0KZ9oGScTFm0sSL7SwTQ/export?format=csv"
     )
 
     # KST 기준: 오전 7시~오후 4시는 15초, 그 외(오후 5시~다음날 오전 6시 59분)는 3시간 주기
