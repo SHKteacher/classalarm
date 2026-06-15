@@ -104,8 +104,8 @@ def get_text_signature(df: Optional[pd.DataFrame]) -> str:
     """A열 내용만 기준으로 변경 감지."""
     if df is None or df.empty:
         return ""
-    col_a = df.iloc[:, 0].astype(str).tolist()
-    joined = "\n".join(col_a)
+col_a = df.iloc[:, 0].fillna("").astype(str).tolist()
+joined = "\n".join(col_a)
     return hashlib.md5(joined.encode("utf-8")).hexdigest()
 
 
