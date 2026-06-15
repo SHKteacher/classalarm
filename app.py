@@ -289,7 +289,7 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
-    sheet_url = "https://docs.google.com/spreadsheets/d/1moZyvDHSsGtwUl19VKeYamJ0KZ9oGScTFm0sSL7SwTQ/export?format=csv"
+    sheet_url = "https://docs.google.com/spreadsheets/d/1moZyvDHSsGtwUl19VKeYamJ0KZ9oGScTFm0sSL7SwTQ/edit?usp=sharing"
 
     kst = ZoneInfo("Asia/Seoul")
     now_kst = datetime.now(kst)
