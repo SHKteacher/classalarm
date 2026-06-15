@@ -11,6 +11,12 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 
+def clean_cell(v) -> str:
+    if pd.isna(v):
+        return ""
+    return str(v).strip()
+
+
 def load_ding_base64() -> str:
     try:
         path = Path(__file__).resolve().parent / "ding.wav"
@@ -85,26 +91,27 @@ def fetch_sheet(url: str) -> pd.DataFrame:
 def get_b2_value(df: pd.DataFrame) -> str:
     if df is None or df.empty or len(df.columns) < 2:
         return ""
-    return str(df.iloc[0, 1]).strip()
+    return clean_cell(df.iloc[0, 1])
 
 
 def get_c2_value(df: pd.DataFrame) -> str:
     if df is None or df.empty or len(df.columns) < 3:
         return ""
-    return str(df.iloc[0, 2]).strip()
+    return clean_cell(df.iloc[0, 2])
 
 
 def get_d2_value(df: pd.DataFrame) -> str:
     if df is None or df.empty or len(df.columns) < 4:
         return ""
-    return str(df.iloc[0, 3]).strip()
+    return clean_cell(df.iloc[0, 3])
 
 
 def get_text_signature(df: Optional[pd.DataFrame]) -> str:
     """A열 내용만 기준으로 변경 감지."""
     if df is None or df.empty:
         return ""
-    col_a = df.iloc[:, 0].astype(str).tolist()
+
+    col_a = df.iloc[:, 0].apply(clean_cell).tolist()
     joined = "\n".join(col_a)
     return hashlib.md5(joined.encode("utf-8")).hexdigest()
 
@@ -121,8 +128,8 @@ def render_board(
         )
         return
 
-    col_a = df.iloc[:, 0]
-    lines = col_a.astype(str).tolist()
+    lines = df.iloc[:, 0].apply(clean_cell).tolist()
+    lines = [line for line in lines if line != ""]
 
     if not lines:
         st.markdown(
@@ -316,6 +323,7 @@ def main() -> None:
     placeholder = st.empty()
 
     from streamlit_autorefresh import st_autorefresh  # type: ignore
+
     st_autorefresh(interval=refresh_interval * 1000, key="sheet_autorefresh")
 
     try:
