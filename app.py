@@ -147,7 +147,7 @@ def render_board(
 
 def main() -> None:
     st.set_page_config(
-        page_title="1-1 전광판",
+        page_title="학급 안내 전광판",
         layout="wide",
         initial_sidebar_state="collapsed",
     )
@@ -289,7 +289,7 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
-    sheet_url = "https://docs.google.com/spreadsheets/d/1dffblmQyM895-ONRKOnwArHwO4T17RHHtKyEoMh4ccI/export?format=csv"
+    sheet_url = "https://docs.google.com/spreadsheets/d/1dp1G3dyQKyM-ko0HFsbYjCxJmrvWDF5YeGFqVdVuXjk/export?format=csv"
 
     kst = ZoneInfo("Asia/Seoul")
     now_kst = datetime.now(kst)
