@@ -105,7 +105,15 @@ def get_text_signature(df: Optional[pd.DataFrame]) -> str:
     if df is None or df.empty:
         return ""
     col_a = df.iloc[:, 0].astype(str).tolist()
+   def get_text_signature(df):
+    if df is None or df.empty:
+        return ""
+
+    col_a = df.iloc[:, 0].fillna("").astype(str).tolist()
     joined = "\n".join(col_a)
+
+    return hashlib.md5(joined.encode("utf-8")).hexdigest()
+    
     return hashlib.md5(joined.encode("utf-8")).hexdigest()
 
 
